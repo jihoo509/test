@@ -50,7 +50,7 @@ export function PrivacyPolicyDialog({
           <Button
             type="button"
             onClick={handleAgree}
-            className="bg-[#f59e0b] hover:bg-[#d97706] text-white"
+            className="bg-[#f59e0b] hover:bg-[#d97706] text-black font-semibold"
           >
             동의하고 닫기
           </Button>
