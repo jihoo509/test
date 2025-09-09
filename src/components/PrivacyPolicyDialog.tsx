@@ -1,14 +1,18 @@
-// ✨ === 경로 수정: 별칭(@/) 대신 상대 경로(../)를 사용합니다 === ✨
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogClose, // 닫기 버튼을 위해 추가
+} from './ui/dialog'; // 기존에 사용하시던 UI 라이브러리를 다시 사용합니다.
+import { Button } from './ui/button';
 import { policyContents, FormType, ContentType } from '../lib/policyContents';
 
-// Props 타입을 정의합니다.
 interface PrivacyPolicyDialogProps {
   isOpen: boolean;
   onClose: () => void;
   formType: FormType;
   contentType: ContentType | null;
-  // onAgree 프롭은 더 이상 사용되지 않으므로 제거하거나 주석 처리합니다.
-  // onAgree?: () => void;
 }
 
 export function PrivacyPolicyDialog({
@@ -17,7 +21,8 @@ export function PrivacyPolicyDialog({
   formType,
   contentType,
 }: PrivacyPolicyDialogProps) {
-  if (!isOpen || !contentType) {
+  // 내용이 선택되지 않으면 팝업을 렌더링하지 않습니다.
+  if (!contentType) {
     return null;
   }
 
@@ -25,22 +30,28 @@ export function PrivacyPolicyDialog({
   const policy = policyContents[formType][contentType];
 
   return (
-    // 기존의 Dialog/Modal 구조와 스타일에 맞게 내부 구조를 조정했습니다.
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50">
-      <div className="bg-white p-6 md:p-8 rounded-2xl max-w-lg w-11/12 max-h-[80vh] flex flex-col">
-        <h2 className="text-2xl font-bold mb-4 text-gray-800">{policy.title}</h2>
-        <div className="flex-grow overflow-y-auto pr-4 text-gray-600 whitespace-pre-wrap">
-          <p>{policy.content}</p>
+    // ✨ Dialog 컴포넌트를 다시 사용하여 z-index, 외부 클릭 종료 등 모든 기존 기능을 복원합니다.
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="bg-white text-gray-800 rounded-lg">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-bold">{policy.title}</DialogTitle>
+        </DialogHeader>
+        {/* 스크롤 가능한 내용 영역 */}
+        <div className="max-h-[60vh] overflow-y-auto pr-4 py-4">
+          <p className="text-sm text-gray-600 whitespace-pre-wrap">{policy.content}</p>
         </div>
-        <div className="text-right mt-6">
-          <button
+        {/* 기존 디자인처럼 하단에 '확인' 버튼을 추가합니다. */}
+        <div className="flex justify-end">
+          <Button
+            type="button"
             onClick={onClose}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors"
+            className="bg-gray-800 text-white hover:bg-gray-700"
           >
             확인
-          </button>
+          </Button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
+
