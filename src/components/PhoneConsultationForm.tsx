@@ -4,7 +4,6 @@ import { Input } from './ui/input';
 import { Checkbox } from './ui/checkbox';
 import { PrivacyPolicyDialog } from './PrivacyPolicyDialog';
 import UtmHiddenFields from './UtmHiddenFields';
-// ✨ === 경로 수정: 별칭(@/) 대신 상대 경로(../)를 사용합니다 === ✨
 import { ContentType } from '../lib/policyContents';
 
 interface PhoneConsultationFormProps {
@@ -272,6 +271,13 @@ export function PhoneConsultationForm({ title }: PhoneConsultationFormProps) {
       <PrivacyPolicyDialog
         isOpen={isModalOpen}
         onClose={handleCloseModal}
+        onAgree={() => {
+          if (modalContentType === 'privacy') {
+            setAgreedToPrivacy(true);
+          } else if (modalContentType === 'thirdParty') {
+            setAgreedToThirdParty(true);
+          }
+        }}
         formType="phone"
         contentType={modalContentType}
       />
