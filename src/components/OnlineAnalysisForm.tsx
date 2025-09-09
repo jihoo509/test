@@ -4,28 +4,39 @@ import { Input } from './ui/input';
 import { Checkbox } from './ui/checkbox';
 import { PrivacyPolicyDialog } from './PrivacyPolicyDialog';
 import UtmHiddenFields from './UtmHiddenFields'; // ✨ UTM 숨김필드
+import { ContentType } from '@/lib/policyContents'; // ✨ 약관 타입을 가져옵니다.
 
 interface OnlineAnalysisFormProps {
   title?: string;
 }
 
 export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
+  // --- 상태(State) 관리 ---
   const [formData, setFormData] = useState({
     name: '',
     birthDateFirst: '',
     birthDateSecond: '',
     gender: '',
     phoneNumber: '',
-    agreedToTerms: false,
+    // agreedToTerms는 분리되었으므로 제거합니다.
   });
+
+  // ✨ 동의 상태를 2개의 개별 상태로 분리합니다.
+  const [agreedToPrivacy, setAgreedToPrivacy] = useState(false);
+  const [agreedToThirdParty, setAgreedToThirdParty] = useState(false);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showPrivacyDialog, setShowPrivacyDialog] = useState(false);
+
+  // ✨ 팝업(Dialog) 상태를 어떤 내용을 보여줄지와 함께 관리합니다.
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalContentType, setModalContentType] = useState<ContentType | null>(null);
 
   const nameInputRef = useRef<HTMLInputElement>(null);
   const birthDateFirstInputRef = useRef<HTMLInputElement>(null);
   const birthDateSecondInputRef = useRef<HTMLInputElement>(null);
   const phoneNumberInputRef = useRef<HTMLInputElement>(null);
 
+  // --- 이벤트 핸들러 ---
   const handleInputFocus = (inputRef: React.RefObject<HTMLInputElement>) => {
     if (inputRef.current && window.innerWidth <= 768) {
       if (inputRef === birthDateFirstInputRef || inputRef === birthDateSecondInputRef) return;
@@ -35,30 +46,49 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
     }
   };
 
-  const handleInputChange = (field: string, value: string | boolean) => {
+  const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const resetForm = () =>
+  const resetForm = () => {
     setFormData({
       name: '',
       birthDateFirst: '',
       birthDateSecond: '',
       gender: '',
       phoneNumber: '',
-      agreedToTerms: false,
     });
+    // ✨ 분리된 동의 상태도 함께 초기화합니다.
+    setAgreedToPrivacy(false);
+    setAgreedToThirdParty(false);
+  };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => { // ✨ 타입 명시
+  // ✨ 팝업을 열고 닫는 핸들러를 새로 만듭니다.
+  const handleOpenModal = (type: ContentType) => {
+    setModalContentType(type);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setModalContentType(null);
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (isSubmitting) return;
+
+    // ✨ 2개의 약관 모두 동의했는지 확인하는 로직을 추가합니다.
+    if (!agreedToPrivacy || !agreedToThirdParty) {
+      alert('모든 약관에 동의해주셔야 신청이 가능합니다.');
+      return;
+    }
+
     setIsSubmitting(true);
 
-    // ✨ 폼 안의 숨김 UTM 필드까지 모두 수집
     const formElements = Object.fromEntries(new FormData(event.currentTarget).entries());
-
     const now = new Date();
-    const kstDate = new Date(now.getTime() + (9 * 60 * 60 * 1000));
+    const kstDate = new Date(now.getTime() + 9 * 60 * 60 * 1000);
 
     try {
       const payload = {
@@ -70,8 +100,6 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
         rrnBack: formData.birthDateSecond.trim(),
         gender: formData.gender as '남' | '여' | '',
         requestedAt: kstDate.toISOString(),
-
-        // ✨ UTM/landing/referrer/first_utm/last_utm 등 포함
         ...formElements,
       };
 
@@ -115,16 +143,16 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
           <p className="text-white text-[22px] md:text-2xl font-extrabold tracking-tight drop-shadow-[0_1px_10px_rgba(0,0,0,.30)]">
             한 눈에 비교 분석할 수 있는
           </p>
-        <p className="text-[22px] md:text-2xl font-black bg-gradient-to-b from-[#FFB648] to-[#FF7A3D] bg-clip-text text-transparent drop-shadow-[0_1px_12px_rgba(255,152,64,.28)]">
+          <p className="text-[22px] md:text-2xl font-black bg-gradient-to-b from-[#FFB648] to-[#FF7A3D] bg-clip-text text-transparent drop-shadow-[0_1px_12px_rgba(255,152,64,.28)]">
             이미지 파일을 보내드립니다.
           </p>
           {title && <p className="mt-2 text-white/85 text-[13px] md:text-sm">{title}</p>}
         </div>
-        
+
         <form onSubmit={handleSubmit} className="space-y-3">
-          {/* ✨ 숨김 UTM 필드 */}
           <UtmHiddenFields />
 
+          {/* 이름, 주민번호, 성별, 전화번호 입력 필드는 그대로 유지됩니다. */}
           <div className="space-y-2">
             <label className="text-white text-base block">이름</label>
             <Input
@@ -136,7 +164,6 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
               className="bg-white border-0 h-12 text-gray-800 placeholder:text-gray-500"
             />
           </div>
-
           <div className="space-y-2">
             <label className="text-white text-base block">주민번호</label>
             <div className="flex space-x-2">
@@ -162,7 +189,6 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
               />
             </div>
           </div>
-
           <div className="space-y-2">
             <label className="text-white text-base block">성별</label>
             <div className="flex h-12 bg-white rounded-md overflow-hidden">
@@ -192,7 +218,6 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
               </Button>
             </div>
           </div>
-
           <div className="space-y-2">
             <label className="text-white text-base block">전화번호</label>
             <div className="flex space-x-2">
@@ -210,29 +235,56 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="online-terms-agreement"
-                checked={formData.agreedToTerms}
-                onCheckedChange={checked => handleInputChange('agreedToTerms', !!checked)}
-                className="border-white data-[state=checked]:bg-[#f59e0b] data-[state=checked]:border-[#f59e0b]"
-              />
-              <label htmlFor="online-terms-agreement" className="text-white text-base cursor-pointer">
-                개인정보 수집 및 이용동의
-              </label>
+          {/* ✨ === 여기가 핵심 수정 부분입니다: 동의 섹션을 2개로 분리 === ✨ */}
+          <div className="space-y-2.5">
+            {/* 개인정보 수집 및 이용 동의 */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="online-privacy-agreement"
+                  checked={agreedToPrivacy}
+                  onCheckedChange={checked => setAgreedToPrivacy(!!checked)}
+                  className="border-white data-[state=checked]:bg-[#f59e0b] data-[state=checked]:border-[#f59e0b]"
+                />
+                <label htmlFor="online-privacy-agreement" className="text-white text-base cursor-pointer">
+                  개인정보 수집 및 이용동의
+                </label>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => handleOpenModal('privacy')}
+                className="bg-white text-gray-800 border-white hover:bg-gray-100 h-8 px-3"
+              >
+                자세히 보기
+              </Button>
             </div>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setShowPrivacyDialog(true)}
-              className="bg-white text-gray-800 border-white hover:bg-gray-100 h-8 px-3"
-            >
-              자세히 보기
-            </Button>
+            {/* 제3자 제공 동의 */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="online-third-party-agreement"
+                  checked={agreedToThirdParty}
+                  onCheckedChange={checked => setAgreedToThirdParty(!!checked)}
+                  className="border-white data-[state=checked]:bg-[#f59e0b] data-[state=checked]:border-[#f59e0b]"
+                />
+                <label htmlFor="online-third-party-agreement" className="text-white text-base cursor-pointer">
+                  제3자 제공 동의
+                </label>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => handleOpenModal('thirdParty')}
+                className="bg-white text-gray-800 border-white hover:bg-gray-100 h-8 px-3"
+              >
+                자세히 보기
+              </Button>
+            </div>
           </div>
-
+          
           <div className="pt-2">
             <Button
               type="submit"
@@ -242,7 +294,9 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
                 !formData.birthDateSecond ||
                 !formData.gender ||
                 !formData.phoneNumber ||
-                !formData.agreedToTerms ||
+                // ✨ disabled 조건도 2개 약관을 모두 확인하도록 변경합니다.
+                !agreedToPrivacy ||
+                !agreedToThirdParty ||
                 isSubmitting
               }
               className="w-full h-14 bg-[#f59e0b] hover:bg-[#d97706] text-white border-0 rounded-full text-lg disabled:opacity-50 disabled:cursor-not-allowed"
@@ -253,11 +307,14 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
         </form>
       </div>
 
+      {/* ✨ 팝업(Dialog) 호출 부분을 수정된 방식에 맞게 변경합니다. */}
       <PrivacyPolicyDialog
-  isOpen={showPrivacyDialog}
-  onClose={() => setShowPrivacyDialog(false)}
-  onAgree={() => handleInputChange('agreedToTerms', true)}
-/>
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        formType="online" // 이 폼은 'online' 타입입니다.
+        contentType={modalContentType}
+      />
     </div>
   );
 }
+
