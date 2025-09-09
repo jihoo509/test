@@ -240,19 +240,21 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
 
           <div className="space-y-2.5">
             <div className="flex items-center justify-between">
-              {/* ✨ 수정: Checkbox를 Label 안으로 넣어 터치 영역을 넓힙니다. */}
-              <label
-                htmlFor="online-privacy-agreement"
-                className="flex items-center space-x-2 text-white text-base cursor-pointer"
-              >
+              {/* ✨ 수정: Checkbox와 Label을 형제 관계로 변경 */}
+              <div className="flex items-center space-x-2">
                 <Checkbox
                   id="online-privacy-agreement"
                   checked={agreedToPrivacy}
                   onCheckedChange={checked => setAgreedToPrivacy(!!checked)}
                   className="border-white data-[state=checked]:bg-[#f59e0b] data-[state=checked]:border-[#f59e0b]"
                 />
-                <span>개인정보 수집 및 이용동의</span>
-              </label>
+                <label
+                  htmlFor="online-privacy-agreement"
+                  className="text-white text-base cursor-pointer"
+                >
+                  개인정보 수집 및 이용동의
+                </label>
+              </div>
               <Button
                 type="button"
                 variant="outline"
@@ -264,19 +266,21 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
               </Button>
             </div>
             <div className="flex items-center justify-between">
-               {/* ✨ 수정: Checkbox를 Label 안으로 넣어 터치 영역을 넓힙니다. */}
-              <label
-                htmlFor="online-third-party-agreement"
-                className="flex items-center space-x-2 text-white text-base cursor-pointer"
-              >
+              {/* ✨ 수정: Checkbox와 Label을 형제 관계로 변경 */}
+              <div className="flex items-center space-x-2">
                 <Checkbox
                   id="online-third-party-agreement"
                   checked={agreedToThirdParty}
                   onCheckedChange={checked => setAgreedToThirdParty(!!checked)}
                   className="border-white data-[state=checked]:bg-[#f59e0b] data-[state=checked]:border-[#f59e0b]"
                 />
-                <span>제3자 제공 동의</span>
-              </label>
+                <label
+                  htmlFor="online-third-party-agreement"
+                  className="text-white text-base cursor-pointer"
+                >
+                  제3자 제공 동의
+                </label>
+              </div>
               <Button
                 type="button"
                 variant="outline"
