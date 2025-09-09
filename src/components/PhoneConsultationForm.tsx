@@ -4,28 +4,24 @@ import { Input } from './ui/input';
 import { Checkbox } from './ui/checkbox';
 import { PrivacyPolicyDialog } from './PrivacyPolicyDialog';
 import UtmHiddenFields from './UtmHiddenFields';
-import { ContentType } from '@/lib/policyContents'; // ✨ 약관 타입을 가져옵니다.
+// ✨ === 경로 수정: 별칭(@/) 대신 상대 경로(../)를 사용합니다 === ✨
+import { ContentType } from '../lib/policyContents';
 
 interface PhoneConsultationFormProps {
   title?: string;
 }
 
 export function PhoneConsultationForm({ title }: PhoneConsultationFormProps) {
-  // --- 상태(State) 관리 ---
   const [formData, setFormData] = useState({
     name: '',
-    birthDate: '', // YYYYMMDD
+    birthDate: '',
     gender: '',
-    phoneNumber: '', // 8자리
+    phoneNumber: '',
   });
 
-  // ✨ 기존 agreedToTerms를 2개의 상태로 분리합니다.
   const [agreedToPrivacy, setAgreedToPrivacy] = useState(false);
   const [agreedToThirdParty, setAgreedToThirdParty] = useState(false);
-
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // ✨ 팝업(Dialog) 상태를 더 유연하게 관리합니다.
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContentType, setModalContentType] = useState<ContentType | null>(null);
 
@@ -33,7 +29,6 @@ export function PhoneConsultationForm({ title }: PhoneConsultationFormProps) {
   const birthDateInputRef = useRef<HTMLInputElement>(null);
   const phoneNumberInputRef = useRef<HTMLInputElement>(null);
 
-  // --- 이벤트 핸들러 ---
   const handleInputFocus = (inputRef: React.RefObject<HTMLInputElement>) => {
     if (inputRef.current && window.innerWidth <= 768) {
       setTimeout(() => {
@@ -48,12 +43,10 @@ export function PhoneConsultationForm({ title }: PhoneConsultationFormProps) {
 
   const resetForm = () => {
     setFormData({ name: '', birthDate: '', gender: '', phoneNumber: '' });
-    // ✨ 동의 체크박스도 초기화합니다.
     setAgreedToPrivacy(false);
     setAgreedToThirdParty(false);
   };
 
-  // ✨ 팝업을 열고 닫는 핸들러를 새로 만듭니다.
   const handleOpenModal = (type: ContentType) => {
     setModalContentType(type);
     setIsModalOpen(true);
@@ -67,18 +60,13 @@ export function PhoneConsultationForm({ title }: PhoneConsultationFormProps) {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (isSubmitting) return;
-
-    // ✨ 2개의 약관 모두 동의했는지 확인합니다.
     if (!agreedToPrivacy || !agreedToThirdParty) {
       alert('모든 약관에 동의해주셔야 신청이 가능합니다.');
       return;
     }
-
     setIsSubmitting(true);
 
-    const form = event.currentTarget;
-    const formElements = Object.fromEntries(new FormData(form).entries());
-
+    const formElements = Object.fromEntries(new FormData(event.currentTarget).entries());
     const now = new Date();
     const kstDate = new Date(now.getTime() + 9 * 60 * 60 * 1000);
 
@@ -104,7 +92,6 @@ export function PhoneConsultationForm({ title }: PhoneConsultationFormProps) {
       if (!res.ok || !data?.ok) {
         throw new Error(data?.error || `서버 오류(${res.status})`);
       }
-
       alert('✅ 전화 상담 신청이 정상적으로 접수되었습니다!');
       resetForm();
     } catch (err: any) {
@@ -143,7 +130,6 @@ export function PhoneConsultationForm({ title }: PhoneConsultationFormProps) {
         <form onSubmit={handleSubmit} className="space-y-3">
           <UtmHiddenFields />
 
-          {/* 이름, 생년월일, 성별, 전화번호 입력 필드는 기존과 동일 */}
           <div className="space-y-2">
             <label className="text-white text-base block">이름</label>
             <Input
@@ -215,10 +201,8 @@ export function PhoneConsultationForm({ title }: PhoneConsultationFormProps) {
               />
             </div>
           </div>
-          
-          {/* ✨ === 여기가 핵심 변경 부분입니다 === ✨ */}
-          <div className="space-y-2.5 pt-1">
-            {/* 개인정보 수집 및 이용 동의 */}
+
+          <div className="space-y-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Checkbox
@@ -241,8 +225,6 @@ export function PhoneConsultationForm({ title }: PhoneConsultationFormProps) {
                 자세히 보기
               </Button>
             </div>
-
-            {/* 제3자 제공 동의 */}
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Checkbox
@@ -275,7 +257,6 @@ export function PhoneConsultationForm({ title }: PhoneConsultationFormProps) {
                 !formData.birthDate ||
                 !formData.gender ||
                 !formData.phoneNumber ||
-                // ✨ disabled 조건도 2개 모두 체크하도록 변경
                 !agreedToPrivacy ||
                 !agreedToThirdParty ||
                 isSubmitting
@@ -288,13 +269,13 @@ export function PhoneConsultationForm({ title }: PhoneConsultationFormProps) {
         </form>
       </div>
 
-      {/* ✨ 팝업(Dialog) 호출 부분을 수정된 상태에 맞게 변경합니다. */}
       <PrivacyPolicyDialog
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        formType="phone" // 이 폼은 '전화 상담'용
+        formType="phone"
         contentType={modalContentType}
       />
     </div>
   );
 }
+

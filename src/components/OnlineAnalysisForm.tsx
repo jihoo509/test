@@ -4,7 +4,8 @@ import { Input } from './ui/input';
 import { Checkbox } from './ui/checkbox';
 import { PrivacyPolicyDialog } from './PrivacyPolicyDialog';
 import UtmHiddenFields from './UtmHiddenFields'; // ✨ UTM 숨김필드
-import { ContentType } from '@/lib/policyContents'; // ✨ 약관 타입을 가져옵니다.
+// ✨ === 경로 수정: 별칭(@/) 대신 상대 경로(../)를 사용합니다 === ✨
+import { ContentType } from '../lib/policyContents';
 
 interface OnlineAnalysisFormProps {
   title?: string;
