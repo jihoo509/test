@@ -18,8 +18,8 @@ export function Footer() {
           <span className="text-lg font-semibold text-white/90">프라임에셋 333본부</span>
         </div>
 
-        {/* 안내 문구 */}
-        <div className="border-t border-white/10 pt-8 text-xs text-white/60 space-y-3 text-center">
+        {/* ✨ 안내 문구: 모바일에서는 왼쪽 정렬(text-left), 데스크톱에서는 가운데 정렬(md:text-center)로 변경 */}
+        <div className="border-t border-white/10 pt-8 text-xs text-white/60 space-y-3 text-left md:text-center">
           <p>
             본 내용은 모집종사자 개인의 의견이며 계약체결에 따른 이익 또는 손실은 보험계약자 등에게 귀속됩니다.
           </p>
@@ -36,7 +36,7 @@ export function Footer() {
             가입 상품에 따라 새로운 면책기간 적용 및 보장 제한 등 기타 불이익이 발생할 수 있습니다.
           </p>
           <p className="pt-4 text-white/80 font-medium">
-            설계사 신지후 (손.생보 협회 등록번호 202507-2000-3328), 프라임에셋심의필 제0000-00-0000호(2025.00.00 ~ 2026.00.00)
+            설계사 신지후 (손.생보 협회 등록번호 00000000000000), 프라임에셋심의필 제0000-00-0000호(2025.00.00 ~ 2026.00.00)
           </p>
         </div>
 
