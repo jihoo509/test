@@ -18,7 +18,7 @@ export function Footer() {
             </div>
             <div>
               {/* ✨ 수정: text-lg 클래스를 추가하여 텍스트 크기를 키웠습니다. */}
-              <p className="font-semibold text-white text-lg">333본부</p>
+              <p className="font-semibold text-white text-lg"></p>
             </div>
           </div>
 
