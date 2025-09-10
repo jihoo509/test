@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import primeAssetLogo from '../assets/prime-asset-logo.png';
-import { PrivacyPolicyFullDialog } from './PrivacyPolicyFullDialog';
+// ✨ 같은 폴더에 있는 PrivacyPolicyFullDialog.tsx 파일을 불러옵니다.
+import { PrivacyPolicyFullDialog } from './PrivacyPolicyFullDialog'; 
 import { Button } from './ui/button';
 
-// ✨ 수정: 'export default function Footer()'가 아닌 'export function Footer()'로 변경했습니다.
 export function Footer() {
   const [isPolicyDialogOpen, setIsPolicyDialogOpen] = useState(false);
 
