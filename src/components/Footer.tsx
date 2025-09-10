@@ -17,7 +17,8 @@ export function Footer() {
               />
             </div>
             <div>
-              <p className="font-semibold text-white">333본부</p>
+              {/* ✨ 수정: text-lg 클래스를 추가하여 텍스트 크기를 키웠습니다. */}
+              <p className="font-semibold text-white text-lg">333본부</p>
             </div>
           </div>
 
@@ -35,7 +36,7 @@ export function Footer() {
 
           {/* 설계사 정보 */}
           <div className="mt-6 text-xs text-white/40">
-            <p>설계사 신지후 (손.생보 협회 등록번호 00000000000000), 프라임에셋심의필 제0000-00-0000호(2025.00.00 ~ 2026.00.00)</p>
+            <p>설계사 신지후 (손.생보 협회 등록번호 202507-2000-3328), 프라임에셋심의필 제0000-00-0000호(2025.00.00 ~ 2026.00.00)</p>
           </div>
 
         </div>
