@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import primeAssetLogo from '../assets/prime-asset-logo.png';
-// ✨ 같은 폴더에 있는 PrivacyPolicyFullDialog.tsx 파일을 불러옵니다.
 import { PrivacyPolicyFullDialog } from './PrivacyPolicyFullDialog'; 
 import { Button } from './ui/button';
 
@@ -9,7 +8,8 @@ export function Footer() {
 
   return (
     <>
-      <footer className="w-full mt-16 lg:mt-24">
+      {/* ✨ 수정: z-index를 추가하여 다른 요소에 가려지지 않도록 합니다. */}
+      <footer className="w-full mt-16 lg:mt-24 relative z-10">
         <div className="bg-black bg-opacity-20 border-t border-white/10">
           <div className="w-full max-w-5xl mx-auto py-10 px-6">
             
@@ -23,14 +23,14 @@ export function Footer() {
                   />
                 </div>
                 <div>
-                  <p className="font-semibold text-white text-lg">프라임에셋 333본부</p>
+                  <p className="font-semibold text-white text-lg"></p>
                 </div>
               </div>
               <div>
                 <Button 
                   variant="link" 
                   onClick={() => setIsPolicyDialogOpen(true)}
-                  className="text-white/70 hover:text-white"
+                  className="text-white/70 hover:text-white underline hover:no-underline"
                 >
                   개인정보 처리방침
                 </Button>
