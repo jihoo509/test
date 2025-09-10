@@ -1,4 +1,4 @@
-import primeAssetLogo from '../assets/prime-asset-logo.png2'; // 1. 새로운 로고 이미지를 import 합니다.
+import primeAssetLogo from '../assets/prime-asset-logo2.png'; // 1. 새로운 로고 이미지를 import 합니다.
 
 export function Footer() {
   return (
