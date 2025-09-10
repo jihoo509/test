@@ -8,7 +8,6 @@ export function Footer() {
 
   return (
     <>
-      {/* ✨ 수정: z-index를 추가하여 다른 요소에 가려지지 않도록 합니다. */}
       <footer className="w-full mt-16 lg:mt-24 relative z-10">
         <div className="bg-black bg-opacity-20 border-t border-white/10">
           <div className="w-full max-w-5xl mx-auto py-10 px-6">
