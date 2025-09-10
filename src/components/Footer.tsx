@@ -1,19 +1,17 @@
-import primeAssetLogo from '../assets/prime-asset-logo2.png'; // 1. 새로운 로고 이미지를 import 합니다.
+import primeAssetLogo from '../assets/prime-asset-logo.png2'; // 1. 새로운 로고 이미지를 import 합니다.
 
 export function Footer() {
   return (
     <footer className="w-full mt-12 lg:mt-20">
       <div className="w-full max-w-5xl mx-auto py-8 px-4 border-t border-white/20">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          {/* 2. 로고 섹션: SVG 대신 <img> 태그를 사용합니다. */}
-          <div className="flex items-center gap-4">
-            <img 
-              src={primeAssetLogo} 
-              alt="프라임에셋 로고" 
-              className="h-10" // 로고 높이를 조절하세요.
-            />
-          </div>
-          <div className="text-center md:text-right text-xs text-white/60">
+        {/* 로고와 회사명 레이아웃 수정 */}
+        <div className="flex flex-col md:flex-row items-center justify-center md:justify-start gap-4">
+          <img 
+            src={primeAssetLogo} 
+            alt="프라임에셋 로고" 
+            className="h-10" // Tip: 배경이 투명한 로고 파일을 사용하시면 훨씬 더 깔끔하게 보입니다.
+          />
+          <div className="text-center md:text-left text-sm text-white/70 pt-2">
             <p>프라임에셋 333본부</p>
           </div>
         </div>
@@ -27,7 +25,7 @@ export function Footer() {
         </div>
 
         <div className="mt-4 text-xs text-white/40 text-center md:text-left">
-          <p>설계사 신지후 (손.생보 협회 등록번호 00000000000000), 프라임에셋심의필 제0000-00-0000호(2025.00.00 ~ 2026.00.00)</p>
+          <p>설계사 신지후 (손.생보 협회 등록번호 202507-2000-3328), 프라임에셋심의필 제0000-00-0000호(2025.00.00 ~ 2026.00.00)</p>
         </div>
       </div>
     </footer>
