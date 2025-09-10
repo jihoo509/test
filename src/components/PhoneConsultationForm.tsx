@@ -72,7 +72,7 @@ export function PhoneConsultationForm({ title }: PhoneConsultationFormProps) {
     try {
       const payload = {
         type: 'phone' as const,
-        site: '치아보험',
+        site: '보험 보장 비교',
         name: formData.name.trim(),
         phone: `010-${(formData.phoneNumber || '').trim()}`,
         birth: formData.birthDate.trim(),
