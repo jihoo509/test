@@ -17,7 +17,7 @@ export function Footer() {
               />
             </div>
             <div>
-              <p className="font-semibold text-white">프라임에셋 333본부</p>
+              <p className="font-semibold text-white">333본부</p>
             </div>
           </div>
 
