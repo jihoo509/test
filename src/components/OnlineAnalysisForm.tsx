@@ -6,12 +6,13 @@ import { PrivacyPolicyDialog } from './PrivacyPolicyDialog';
 import UtmHiddenFields from './UtmHiddenFields';
 import { ContentType } from '../lib/policyContents';
 
+// 1. 인터페이스 이름 변경
 interface OnlineAnalysisFormProps {
   title?: string;
 }
 
+// 2. 컴포넌트 이름 변경
 export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
-  // ✨ 수정: 주민번호(birthDateFirst, birthDateSecond)를 생년월일(birthDate)로 변경합니다.
   const [formData, setFormData] = useState({
     name: '',
     birthDate: '', 
@@ -23,14 +24,13 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
   const [agreedToThirdParty, setAgreedToThirdParty] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalContentType, setModalContentType] = useState<ContentType | null>(
-    null,
-  );
+  const [modalContentType, setModalContentType] = useState<ContentType | null>(null);
 
   const nameInputRef = useRef<HTMLInputElement>(null);
-  // ✨ 수정: 생년월일 입력창 ref를 하나로 통합합니다.
   const birthDateInputRef = useRef<HTMLInputElement>(null);
   const phoneNumberInputRef = useRef<HTMLInputElement>(null);
+
+  // --- 아래 로직은 PhoneConsultationForm과 동일 ---
 
   const handleInputFocus = (inputRef: React.RefObject<HTMLInputElement>) => {
     if (inputRef.current && window.innerWidth <= 768) {
@@ -45,7 +45,6 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
   };
 
   const resetForm = () => {
-    // ✨ 수정: 초기화할 상태를 생년월일로 변경합니다.
     setFormData({
       name: '',
       birthDate: '',
@@ -82,7 +81,7 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
     const kstDate = new Date(now.getTime() + 9 * 60 * 60 * 1000);
 
     try {
-      // ✨ 수정: 서버로 보내는 데이터에서 주민번호(rrnFront, rrnBack)를 생년월일(birth)로 변경합니다.
+      // 3. 서버로 보내는 payload의 type을 'online'으로 변경
       const payload = {
         type: 'online' as const,
         site: '보험 보장 비교',
@@ -104,6 +103,7 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
       if (!res.ok || !data?.ok) {
         throw new Error(data?.error || `서버 오류(${res.status})`);
       }
+      // 4. 성공 메시지 변경
       alert('✅ 온라인 분석 신청이 정상적으로 접수되었습니다!');
       resetForm();
     } catch (err: any) {
@@ -129,6 +129,7 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
           `,
         }}
       >
+        {/* 5. 폼 제목 텍스트 변경 */}
         <div className="text-center space-y-1.5 mb-5">
           <p className="text-white text-[22px] md:text-2xl font-extrabold tracking-tight drop-shadow-[0_1px_10px_rgba(0,0,0,.30)]">
             한 눈에 비교 분석할 수 있는
@@ -143,7 +144,8 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <UtmHiddenFields />
-
+          
+          {/* 입력 필드들은 PhoneConsultationForm과 동일 (생년월일) */}
           <div className="space-y-2">
             <label className="text-white text-base block">이름</label>
             <Input
@@ -156,8 +158,6 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
               required
             />
           </div>
-
-          {/* ✨ 수정: 주민번호 입력창을 생년월일 입력창 하나로 변경합니다. */}
           <div className="space-y-2">
             <label className="text-white text-base block">생년월일</label>
             <Input
@@ -171,7 +171,6 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
               required
             />
           </div>
-
           <div className="space-y-2">
             <label className="text-white text-base block">성별</label>
             <div className="flex h-12 bg-white rounded-md overflow-hidden">
@@ -201,7 +200,6 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
               </Button>
             </div>
           </div>
-
           <div className="space-y-2">
             <label className="text-white text-base block">전화번호</label>
             <div className="flex space-x-2">
@@ -219,21 +217,20 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
               />
             </div>
           </div>
-
+          
+          {/* 체크박스 구조는 PhoneConsultationForm과 동일 */}
           <div className="space-y-2.5">
             <div className="flex items-center justify-between">
-              <div
-                className="flex items-center space-x-2 text-white text-base cursor-pointer"
-                onClick={() => setAgreedToPrivacy(!agreedToPrivacy)}
-              >
+              {/* 6. 체크박스 id와 htmlFor를 'online'으로 변경 */}
+              <label htmlFor="online-privacy-agreement" className="flex items-center space-x-2 text-white text-base cursor-pointer">
                 <Checkbox
                   id="online-privacy-agreement"
                   checked={agreedToPrivacy}
-                  onCheckedChange={checked => setAgreedToPrivacy(!!checked)}
+                  onCheckedChange={(checked) => setAgreedToPrivacy(!!checked)}
                   className="border-white data-[state=checked]:bg-[#f59e0b] data-[state=checked]:border-[#f59e0b]"
                 />
                 <span>개인정보 수집 및 이용동의</span>
-              </div>
+              </label>
               <Button
                 type="button"
                 variant="outline"
@@ -245,18 +242,16 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
               </Button>
             </div>
             <div className="flex items-center justify-between">
-              <div
-                className="flex items-center space-x-2 text-white text-base cursor-pointer"
-                onClick={() => setAgreedToThirdParty(!agreedToThirdParty)}
-              >
+              {/* 6. 체크박스 id와 htmlFor를 'online'으로 변경 */}
+              <label htmlFor="online-third-party-agreement" className="flex items-center space-x-2 text-white text-base cursor-pointer">
                 <Checkbox
                   id="online-third-party-agreement"
                   checked={agreedToThirdParty}
-                  onCheckedChange={checked => setAgreedToThirdParty(!!checked)}
+                  onCheckedChange={(checked) => setAgreedToThirdParty(!!checked)}
                   className="border-white data-[state=checked]:bg-[#f59e0b] data-[state=checked]:border-[#f59e0b]"
                 />
                 <span>제3자 제공 동의</span>
-              </div>
+              </label>
               <Button
                 type="button"
                 variant="outline"
@@ -273,7 +268,6 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
             <Button
               type="submit"
               disabled={
-                // ✨ 수정: 버튼 비활성화 조건을 생년월일로 변경합니다.
                 !formData.name ||
                 !formData.birthDate ||
                 !formData.gender ||
@@ -284,6 +278,7 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
               }
               className="w-full h-14 bg-[#f59e0b] hover:bg-[#d97706] text-white border-0 rounded-full text-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
+              {/* 7. 버튼 텍스트 변경 */}
               {isSubmitting ? '신청 중...' : '온라인분석 신청하기'}
             </Button>
           </div>
@@ -300,6 +295,7 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
             setAgreedToThirdParty(true);
           }
         }}
+        // 8. formType을 'online'으로 변경
         formType="online"
         contentType={modalContentType}
       />
