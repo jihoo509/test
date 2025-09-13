@@ -35,7 +35,7 @@ export function PrivacyPolicyFullDialog({ isOpen, onClose }: PrivacyPolicyFullDi
           <div className="space-y-3">
             <h3 className="font-bold text-base text-gray-900">수집하는 개인정보 항목</h3>
             <div className="pl-4 space-y-1">
-              <p>가. 개인정보 항목 : 성명, 성별, 생년월일, 생년월일, 전화번호</p>
+              <p>가. 개인정보 항목 : 성명, 성별, 생년월일, 전화번호</p>
               <p>나. 수집방법 : 홈페이지 상담신청 시 입력란에 본인이 입력하는 방식</p>
             </div>
           </div>
@@ -47,7 +47,7 @@ export function PrivacyPolicyFullDialog({ isOpen, onClose }: PrivacyPolicyFullDi
               <ul className="list-disc list-inside text-gray-600 space-y-1 pl-2">
                 <li>제공받는자: 프라임에셋 333본부 소속 설계사</li>
                 <li>제공목적: 보험상담 및 가입권유 서비스</li>
-                <li>제공항목: 성명, 성별, 생년월일, 생년월일, 전화번호</li>
+                <li>제공항목: 성명, 성별, 생년월일, 전화번호</li>
                 <li>보유기간: 제공일(수집일)로부터 2개월</li>
               </ul>
             </div>
