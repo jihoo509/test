@@ -5,19 +5,19 @@ import { Checkbox } from './ui/checkbox';
 import { PrivacyPolicyDialog } from './PrivacyPolicyDialog';
 import UtmHiddenFields from './UtmHiddenFields';
 import { ContentType } from '../lib/policyContents';
+import { Textarea } from './ui/textarea'; // ✨ Textarea 컴포넌트를 import 합니다.
 
-// 1. 인터페이스 이름 변경
 interface OnlineAnalysisFormProps {
   title?: string;
 }
 
-// 2. 컴포넌트 이름 변경
 export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
   const [formData, setFormData] = useState({
     name: '',
     birthDate: '', 
     gender: '',
     phoneNumber: '',
+    notes: '', // ✨ '문의사항'을 위한 상태 추가
   });
 
   const [agreedToPrivacy, setAgreedToPrivacy] = useState(false);
@@ -30,9 +30,7 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
   const birthDateInputRef = useRef<HTMLInputElement>(null);
   const phoneNumberInputRef = useRef<HTMLInputElement>(null);
 
-  // --- 아래 로직은 PhoneConsultationForm과 동일 ---
-
-  const handleInputFocus = (inputRef: React.RefObject<HTMLInputElement>) => {
+  const handleInputFocus = (inputRef: React.RefObject<HTMLInputElement | HTMLTextAreaElement>) => { // Textarea ref도 처리
     if (inputRef.current && window.innerWidth <= 768) {
       setTimeout(() => {
         inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -50,6 +48,7 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
       birthDate: '',
       gender: '',
       phoneNumber: '',
+      notes: '', // ✨ 리셋 시 '문의사항'도 초기화
     });
     setAgreedToPrivacy(false);
     setAgreedToThirdParty(false);
@@ -81,7 +80,6 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
     const kstDate = new Date(now.getTime() + 9 * 60 * 60 * 1000);
 
     try {
-      // 3. 서버로 보내는 payload의 type을 'online'으로 변경
       const payload = {
         type: 'online' as const,
         site: '보험 보장 비교',
@@ -89,6 +87,7 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
         phone: `010-${(formData.phoneNumber || '').trim()}`,
         birth: formData.birthDate.trim(),
         gender: formData.gender as '남' | '여' | '',
+        notes: formData.notes.trim(), // ✨ '문의사항' 데이터 추가
         requestedAt: kstDate.toISOString(),
         ...formElements,
       };
@@ -103,7 +102,6 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
       if (!res.ok || !data?.ok) {
         throw new Error(data?.error || `서버 오류(${res.status})`);
       }
-      // 4. 성공 메시지 변경
       alert('✅ 온라인 분석 신청이 정상적으로 접수되었습니다!');
       resetForm();
     } catch (err: any) {
@@ -129,7 +127,6 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
           `,
         }}
       >
-        {/* 5. 폼 제목 텍스트 변경 */}
         <div className="text-center space-y-1.5 mb-5">
           <p className="text-white text-[22px] md:text-2xl font-extrabold tracking-tight drop-shadow-[0_1px_10px_rgba(0,0,0,.30)]">
             한 눈에 비교 분석할 수 있는
@@ -145,7 +142,6 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
         <form onSubmit={handleSubmit} className="space-y-3">
           <UtmHiddenFields />
           
-          {/* 입력 필드들은 PhoneConsultationForm과 동일 (생년월일) */}
           <div className="space-y-2">
             <label className="text-white text-base block">이름</label>
             <Input
@@ -217,11 +213,21 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
               />
             </div>
           </div>
+
+          {/* ✨ '문의사항' 입력 칸 추가 */}
+          <div className="space-y-2">
+            <label className="text-white text-base block">문의사항 (선택)</label>
+            <Textarea
+              placeholder="궁금한 점이나 특별히 원하는 점이 있다면 자유롭게 적어주세요."
+              value={formData.notes}
+              onChange={e => handleInputChange('notes', e.target.value)}
+              className="bg-white border-0 text-gray-800 placeholder:text-gray-500"
+              rows={3}
+            />
+          </div>
           
-          {/* 체크박스 구조는 PhoneConsultationForm과 동일 */}
           <div className="space-y-2.5">
             <div className="flex items-center justify-between">
-              {/* 6. 체크박스 id와 htmlFor를 'online'으로 변경 */}
               <label htmlFor="online-privacy-agreement" className="flex items-center space-x-2 text-white text-base cursor-pointer">
                 <Checkbox
                   id="online-privacy-agreement"
@@ -242,7 +248,6 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
               </Button>
             </div>
             <div className="flex items-center justify-between">
-              {/* 6. 체크박스 id와 htmlFor를 'online'으로 변경 */}
               <label htmlFor="online-third-party-agreement" className="flex items-center space-x-2 text-white text-base cursor-pointer">
                 <Checkbox
                   id="online-third-party-agreement"
@@ -278,7 +283,6 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
               }
               className="w-full h-14 bg-[#f59e0b] hover:bg-[#d97706] text-white border-0 rounded-full text-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {/* 7. 버튼 텍스트 변경 */}
               {isSubmitting ? '신청 중...' : '온라인분석 신청하기'}
             </Button>
           </div>
@@ -295,7 +299,6 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
             setAgreedToThirdParty(true);
           }
         }}
-        // 8. formType을 'online'으로 변경
         formType="online"
         contentType={modalContentType}
       />
