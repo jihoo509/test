@@ -2,16 +2,15 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 export const config = { runtime: 'nodejs' };
 
-// ✨ 수정: rrnFront, rrnBack 대신 birth를 사용하도록 타입을 단순화할 수 있습니다.
 type SubmitBody = {
   type: 'phone' | 'online';
   site?: string;
   name?: string;
   phone?: string;
-  birth?: string; // YYMMDD or YYYYMMDD
-  gender?: '남' | '여';
+  birth?: string;
+  notes?: string; // ✨ '문의사항' 필드를 타입에 추가합니다.
 
-  // UTM & 유입 정보
+  gender?: '남' | '여';
   utm_source?: string;
   utm_medium?: string;
   utm_campaign?: string;
@@ -36,12 +35,18 @@ async function fetchWithTimeout(url: string, options: RequestInit = {}, timeout 
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (!GH_TOKEN || !GH_REPO_FULLNAME) {
+    console.error('Server config error: GH_TOKEN or GH_REPO_FULLNAME is not set.');
+    return res.status(500).json({ 
+      ok: false, 
+      error: 'Server configuration error',
+      detail: 'GitHub API environment variables are not set.'
+    });
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ ok: false, error: 'POST only' });
   }
-  if (!GH_TOKEN || !GH_REPO_FULLNAME) {
-    return res.status(500).json({ ok: false, error: 'Server configuration error: GitHub environment variables are not set.' });
-  }
 
   const body = req.body as SubmitBody;
 
@@ -54,12 +59,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ ok: false, error: 'Invalid type' });
   }
 
-  // ✨ 수정: 제목 생성 로직을 'birth' 필드 기준으로 통합합니다.
-  const birth = body.birth || ''; // YYYYMMDD 형식
-  // YYYYMMDD 형식에서 YYMMDD 부분만 잘라내어 마스킹합니다. (예: 850101-*******)
-  const masked = birth.length >= 6 ? `${birth.slice(-6)}-*******` : '생년월일 미입력';
+  const birth6 = body.birth || '';
+  const masked = birth6 ? `${birth6}-*******` : '생년월일 미입력';
   const requestKo = type === 'phone' ? '전화' : '온라인';
-  const title = `[${requestKo}] ${name || '이름 미입력'} / ${gender || '성별 미선택'} / ${masked} / ${body.phone || '전화번호 미입력'}`;
+
+  // ✨ 수정: 문의사항이 있으면 제목에 표시를 추가합니다.
+  const hasNotes = body.notes && body.notes.trim().length > 0;
+  const title = `[${requestKo}] ${name || '이름 미입력'} / ${gender || '성별 미선택'} / ${masked} / ${body.phone || '전화번호 미입력'}${hasNotes ? ' / 문의O' : ''}`;
 
   const labels = [`type:${type}`, `site:${site}`];
 
@@ -86,12 +92,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (!resp.ok) {
       const text = await resp.text();
+      console.error('GitHub API Error:', text);
       return res.status(500).json({ ok: false, error: 'GitHub error', detail: text });
     }
 
     const issue = await resp.json();
     return res.status(200).json({ ok: true, number: issue.number });
   } catch (e: any) {
+    console.error('Internal Server Error:', e);
     if (e?.name === 'AbortError') return res.status(504).json({ ok: false, error: 'Gateway Timeout from GitHub API' });
     return res.status(500).json({ ok: false, error: 'Internal Server Error', detail: e?.message || String(e) });
   }
