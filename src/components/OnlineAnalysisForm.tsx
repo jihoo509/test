@@ -11,10 +11,10 @@ interface OnlineAnalysisFormProps {
 }
 
 export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
+  // ✨ 수정: 주민번호(birthDateFirst, birthDateSecond)를 생년월일(birthDate)로 변경합니다.
   const [formData, setFormData] = useState({
     name: '',
-    birthDateFirst: '',
-    birthDateSecond: '',
+    birthDate: '', 
     gender: '',
     phoneNumber: '',
   });
@@ -28,17 +28,12 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
   );
 
   const nameInputRef = useRef<HTMLInputElement>(null);
-  const birthDateFirstInputRef = useRef<HTMLInputElement>(null);
-  const birthDateSecondInputRef = useRef<HTMLInputElement>(null);
+  // ✨ 수정: 생년월일 입력창 ref를 하나로 통합합니다.
+  const birthDateInputRef = useRef<HTMLInputElement>(null);
   const phoneNumberInputRef = useRef<HTMLInputElement>(null);
 
   const handleInputFocus = (inputRef: React.RefObject<HTMLInputElement>) => {
     if (inputRef.current && window.innerWidth <= 768) {
-      if (
-        inputRef === birthDateFirstInputRef ||
-        inputRef === birthDateSecondInputRef
-      )
-        return;
       setTimeout(() => {
         inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }, 300);
@@ -50,10 +45,10 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
   };
 
   const resetForm = () => {
+    // ✨ 수정: 초기화할 상태를 생년월일로 변경합니다.
     setFormData({
       name: '',
-      birthDateFirst: '',
-      birthDateSecond: '',
+      birthDate: '',
       gender: '',
       phoneNumber: '',
     });
@@ -87,13 +82,13 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
     const kstDate = new Date(now.getTime() + 9 * 60 * 60 * 1000);
 
     try {
+      // ✨ 수정: 서버로 보내는 데이터에서 주민번호(rrnFront, rrnBack)를 생년월일(birth)로 변경합니다.
       const payload = {
         type: 'online' as const,
         site: '보험 보장 비교',
         name: formData.name.trim(),
         phone: `010-${(formData.phoneNumber || '').trim()}`,
-        rrnFront: formData.birthDateFirst.trim(),
-        rrnBack: formData.birthDateSecond.trim(),
+        birth: formData.birthDate.trim(),
         gender: formData.gender as '남' | '여' | '',
         requestedAt: kstDate.toISOString(),
         ...formElements,
@@ -162,32 +157,19 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
             />
           </div>
 
+          {/* ✨ 수정: 주민번호 입력창을 생년월일 입력창 하나로 변경합니다. */}
           <div className="space-y-2">
-            <label className="text-white text-base block">주민번호</label>
-            <div className="flex space-x-2">
-              <Input
-                ref={birthDateFirstInputRef}
-                placeholder="앞 6자리"
-                value={formData.birthDateFirst}
-                onChange={e => handleInputChange('birthDateFirst', e.target.value)}
-                onFocus={() => handleInputFocus(birthDateFirstInputRef)}
-                className="bg-white border-0 h-12 text-gray-800 placeholder:text-gray-500 flex-1"
-                maxLength={6}
-                required
-              />
-              <span className="text-white text-2xl flex items-center">-</span>
-              <Input
-                ref={birthDateSecondInputRef}
-                placeholder="뒤 7자리"
-                type="password"
-                value={formData.birthDateSecond}
-                onChange={e => handleInputChange('birthDateSecond', e.target.value)}
-                onFocus={() => handleInputFocus(birthDateSecondInputRef)}
-                className="bg-white border-0 h-12 text-gray-800 placeholder:text-gray-500 flex-1"
-                maxLength={7}
-                required
-              />
-            </div>
+            <label className="text-white text-base block">생년월일</label>
+            <Input
+              ref={birthDateInputRef}
+              placeholder="생년월일을 입력 (예:19850101)"
+              value={formData.birthDate}
+              onChange={e => handleInputChange('birthDate', e.target.value)}
+              onFocus={() => handleInputFocus(birthDateInputRef)}
+              className="bg-white border-0 h-12 text-gray-800 placeholder:text-gray-500"
+              maxLength={8}
+              required
+            />
           </div>
 
           <div className="space-y-2">
@@ -240,10 +222,9 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
 
           <div className="space-y-2.5">
             <div className="flex items-center justify-between">
-              {/* ✨ 수정: Checkbox와 텍스트를 Label로 감싸 터치 영역을 보장합니다. */}
-              <label
-                htmlFor="online-privacy-agreement"
+              <div
                 className="flex items-center space-x-2 text-white text-base cursor-pointer"
+                onClick={() => setAgreedToPrivacy(!agreedToPrivacy)}
               >
                 <Checkbox
                   id="online-privacy-agreement"
@@ -252,7 +233,7 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
                   className="border-white data-[state=checked]:bg-[#f59e0b] data-[state=checked]:border-[#f59e0b]"
                 />
                 <span>개인정보 수집 및 이용동의</span>
-              </label>
+              </div>
               <Button
                 type="button"
                 variant="outline"
@@ -264,10 +245,9 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
               </Button>
             </div>
             <div className="flex items-center justify-between">
-               {/* ✨ 수정: Checkbox와 텍스트를 Label로 감싸 터치 영역을 보장합니다. */}
-              <label
-                htmlFor="online-third-party-agreement"
+              <div
                 className="flex items-center space-x-2 text-white text-base cursor-pointer"
+                onClick={() => setAgreedToThirdParty(!agreedToThirdParty)}
               >
                 <Checkbox
                   id="online-third-party-agreement"
@@ -276,7 +256,7 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
                   className="border-white data-[state=checked]:bg-[#f59e0b] data-[state=checked]:border-[#f59e0b]"
                 />
                 <span>제3자 제공 동의</span>
-              </label>
+              </div>
               <Button
                 type="button"
                 variant="outline"
@@ -293,9 +273,9 @@ export function OnlineAnalysisForm({ title }: OnlineAnalysisFormProps) {
             <Button
               type="submit"
               disabled={
+                // ✨ 수정: 버튼 비활성화 조건을 생년월일로 변경합니다.
                 !formData.name ||
-                !formData.birthDateFirst ||
-                !formData.birthDateSecond ||
+                !formData.birthDate ||
                 !formData.gender ||
                 !formData.phoneNumber ||
                 !agreedToPrivacy ||
